@@ -1,0 +1,215 @@
+/* Minimalist Clean / Japandi Casual Layout System (Borderless) */
+
+@import url('https://fonts.googleapis.com/css2?family=Gveret+Levin&family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
+
+:root {
+  /* Color Palette */
+  --page-bg: #faf9f6;         /* Clean cream white background */
+  --text-primary: #111111;    /* Rich dark charcoal text */
+  --gray-muted: #6e6a64;      /* Muted secondary body text */
+  --border-dark: #222222;     /* Retained only for interactive inputs/buttons if needed */
+  --link-blue: #0022ff;       /* Classic blueprint blue */
+  --link-blue-hover: #0011aa;
+  
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--page-bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+/* Center card container (borderless & shadowless) */
+.app-card {
+  width: 100%;
+  max-width: 960px;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header section matching the avatar and title */
+.header-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 0; /* Removed horizontal padding, aligned to edges */
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.avatar-circle {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #eee;
+  flex-shrink: 0;
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brand-title {
+  font-family: 'Gveret Levin', cursive;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+}
+
+/* Main body divided into left & right columns */
+.columns-container {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  margin-top: 16px;
+}
+
+.left-column {
+  padding: 24px 32px 24px 0; /* Removed left padding to align with header */
+}
+
+.right-column {
+  padding: 24px 0 24px 32px; /* Aligned right column content */
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+@media (max-width: 768px) {
+  .columns-container {
+    grid-template-columns: 1fr;
+  }
+  .left-column {
+    padding: 24px 0;
+  }
+  .right-column {
+    padding: 24px 0;
+  }
+}
+
+/* Links & Typography */
+h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+p {
+  margin-bottom: 16px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+a, .blue-link {
+  color: var(--link-blue);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+a:hover, .blue-link:hover {
+  color: var(--link-blue-hover);
+}
+
+/* Custom list layout matching bullet points in image */
+.links-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.links-list li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 0.95rem;
+}
+
+.links-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--text-primary);
+}
+
+/* Form Styles for interactive tools inside columns */
+input[type="text"], input[type="email"], input[type="password"], textarea, select {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  padding: 10px;
+  border: 1px solid var(--border-dark);
+  background-color: var(--page-bg);
+  color: var(--text-primary);
+  outline: none;
+}
+
+textarea {
+  font-family: var(--font-mono);
+}
+
+button.primary, .btn-primary {
+  background-color: var(--text-primary);
+  color: #ffffff;
+  border: 1px solid var(--text-primary);
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+button.primary:hover, .btn-primary:hover {
+  opacity: 0.9;
+}
+
+button.secondary, .btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-dark);
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.secondary:hover, .btn-secondary:hover {
+  background-color: var(--page-bg);
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.badge-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  border: 1px solid var(--border-dark);
+  background-color: var(--page-bg);
+  font-weight: 600;
+  margin-left: 8px;
+}

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdCompare | Real-Time Meta Ads Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root { --bs-primary: #1877f2; }
+        body { background-color: #f0f2f5; font-family: -apple-system, sans-serif; color: #1c1e21; }
+        .navbar { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .hero-img { width: 100%; height: 250px; object-fit: cover; border-radius: 12px 12px 0 0; }
+        .table-container { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #dee2e6; }
+        .table thead th { background-color: #f8f9fa; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; color: #65676b; padding: 1rem; vertical-align: top; }
+        .metric-cell { min-width: 140px; transition: background 0.2s; }
+        
+        .reach-freq-value { font-size: 0.75rem; color: #6c757d; font-weight: 500; }
+        .res-value { font-size: 1.1rem; font-weight: 700; color: #0d6efd; line-height: 1.2; }
+        .cpr-value { font-size: 0.9rem; font-weight: 600; color: #198754; }
+        
+        .ad-name-col { 
+            min-width: 320px; 
+            background: #fff; 
+            position: sticky; 
+            left: 0; 
+            z-index: 10; 
+            border-right: 2px solid #dee2e6 !important; 
+        }
+
+        .ad-name-header { display: flex; flex-direction: column; gap: 8px; }
+        .ad-row-content { display: flex; align-items: flex-start; justify-content: space-between; width: 100%; }
+        .ad-info-main { display: flex; flex-direction: column; line-height: 1.2; }
+        .ad-meta-subtitle { font-size: 0.7rem; color: #65676b; font-weight: normal; margin-top: 4px; }
+        .total-col { background-color: #f8f9fa !important; border-left: 2px solid #dee2e6 !important; font-weight: bold; }
+        .pinned-row { background-color: #f0f7ff !important; border-bottom: 2px solid #0d6efd !important; }
+        .pin-btn { color: #ccc; cursor: pointer; transition: color 0.2s; font-size: 1.1rem; margin-top: -2px; }
+        .pin-btn.active { color: #0d6efd; }
+        .pin-btn:hover { color: #0d6efd; }
+
+        #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
+        .btn-fb { background-color: #1877f2; color: white; border-radius: 8px; font-weight: 600; padding: 12px 24px; }
+        .btn-fb:hover { background-color: #166fe5; color: white; }
+        .btn-fb:disabled { background-color: #89b4f7; cursor: not-allowed; }
+        
+        .search-container { position: relative; width: 100%; }
+        .search-container i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #65676b; font-size: 0.8rem; }
+        .search-container input { padding-left: 30px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <div id="fb-root"></div>
+    <div id="loader">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 fw-bold" id="loader-text">Connecting to Meta...</p>
+    </div>
+
+    <nav class="navbar sticky-top mb-4">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold text-primary" href="#">
+                <i class="bi bi-megaphone-fill me-2"></i> AdCompare
+            </a>
+            <div id="user-info" class="d-none">
+                <span id="user-name" class="text-muted small me-3"></span>
+                <button class="btn btn-sm btn-outline-danger" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        
+        <!-- Login View -->
+        <div id="auth-section" class="row justify-content-center mt-5">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800" class="hero-img">
+                    <div class="card-body p-5 text-center">
+                        <h2 class="fw-bold mb-3">Ads Result Comparison</h2>
+                        <p class="text-muted mb-4">Log in with your Facebook account to pull real-time campaign insights and compare performance across dates.</p>
+                        
+                        <button id="btn-login" class="btn btn-fb btn-lg w-100 shadow-sm" disabled>
+                            <i class="bi bi-facebook me-2"></i><span id="login-text">Loading SDK...</span>
+                        </button>
+
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="privacy.html" target="_blank" class="text-decoration-none small text-muted">
+                                <i class="bi bi-shield-lock me-1"></i>Privacy Policy
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard View (State Managed via JS) -->
+        <div id="dashboard-section" class="d-none">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">1. Select Ad Account</label>
+                            <select id="account-selector" class="form-select"></select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold">2. From</label>
+                            <input type="date" id="date-start" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold">3. To</label>
+                            <input type="date" id="date-end" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold">4. Result Metric</label>
+                            <select id="metric-selector" class="form-select">
+                                <option value="all">Total Actions (All)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex flex-column gap-2">
+                            <div class="form-check form-switch mb-1">
+                                <input class="form-check-input" type="checkbox" id="toggle-reach-freq" checked>
+                                <label class="form-check-label small fw-bold" for="toggle-reach-freq">Show Reach & Freq</label>
+                            </div>
+                            <button id="btn-fetch" class="btn btn-primary w-100 fw-bold">
+                                <i class="bi bi-graph-up me-2"></i>Fetch Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="table-wrapper" class="table-container d-none shadow">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead id="table-head"></thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="empty-state" class="text-center p-5 mt-4 bg-white rounded shadow-sm">
+                <i class="bi bi-calendar-range display-1 text-light"></i>
+                <h4 class="mt-3">Ready to Analyze</h4>
+                <p class="text-muted">Select an account and date range to generate your report.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const APP_ID = '2107584723372135'; 
+        const API_VERSION = 'v19.0';
+        
+        let userAccessToken = '', adAccounts = [], fbSdkLoaded = false;
+        let adsDataMap = {}, sortedDates = [], pinnedAds = new Set();
+        let currentFilter = "", accountCurrency = "USD", availableActionTypes = new Set();
+        let selectedMetric = "all", showReachFreq = true;
+
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : APP_ID,
+                cookie     : true,
+                xfbml      : true,
+                version    : API_VERSION
+            });
+            fbSdkLoaded = true;
+            const loginBtn = document.getElementById('btn-login');
+            if(loginBtn) {
+                loginBtn.disabled = false;
+                document.getElementById('login-text').innerText = "Login with Facebook";
+            }
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        const toggleLoader = (show, text = "Connecting...") => {
+            document.getElementById('loader').style.display = show ? 'flex' : 'none';
+            document.getElementById('loader-text').innerText = text;
+        };
+
+        const setDefaultDates = () => {
+            const today = new Date();
+            const lastWeek = new Date(today);
+            lastWeek.setDate(today.getDate() - 7);
+            document.getElementById('date-end').value = today.toISOString().split('T')[0];
+            document.getElementById('date-start').value = lastWeek.toISOString().split('T')[0];
+        };
+
+        const formatCurrency = (amount) => {
+            if (amount === '-' || isNaN(amount)) return '-';
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: accountCurrency }).format(amount);
+        };
+
+        async function login() {
+            if (!fbSdkLoaded) return;
+            FB.login((response) => {
+                if (response.authResponse) {
+                    userAccessToken = response.authResponse.accessToken;
+                    initDashboard();
+                }
+            }, { scope: 'ads_read,public_profile' });
+        }
+
+        async function initDashboard() {
+            toggleLoader(true, "Fetching Ad Accounts...");
+            try {
+                const response = await fetch(`https://graph.facebook.com/${API_VERSION}/me/adaccounts?fields=name,account_id,currency&access_token=${userAccessToken}`);
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                adAccounts = data.data;
+                const selector = document.getElementById('account-selector');
+                selector.innerHTML = adAccounts.map(acc => `<option value="${acc.id}" data-currency="${acc.currency}">${acc.name}</option>`).join('');
+                if (adAccounts.length > 0) accountCurrency = adAccounts[0].currency;
+                document.getElementById('auth-section').classList.add('d-none');
+                document.getElementById('dashboard-section').classList.remove('d-none');
+                document.getElementById('user-info').classList.remove('d-none');
+                setDefaultDates();
+            } catch (err) { alert(err.message); } finally { toggleLoader(false); }
+        }
+
+        async function fetchReport() {
+            const selector = document.getElementById('account-selector');
+            const accountId = selector.value;
+            const start = document.getElementById('date-start').value;
+            const end = document.getElementById('date-end').value;
+            accountCurrency = selector.options[selector.selectedIndex].dataset.currency || "USD";
+            toggleLoader(true, "Pulling Campaign Insights...");
+            try {
+                const fields = 'ad_name,objective,adset_name,date_start,actions,spend,reach,frequency,impressions';
+                const timeRange = JSON.stringify({ "since": start, "until": end });
+                const url = `https://graph.facebook.com/${API_VERSION}/${accountId}/insights?level=ad&fields=${fields}&time_increment=1&time_range=${encodeURIComponent(timeRange)}&limit=5000&access_token=${userAccessToken}`;
+                const response = await fetch(url);
+                const result = await response.json();
+                if (result.error) throw new Error(result.error.message);
+                processData(result.data);
+                updateMetricSelector();
+                renderTableUI();
+            } catch (err) { alert(err.message); } finally { toggleLoader(false); }
+        }
+
+        function processData(rawData) {
+            adsDataMap = {}; const dateSet = new Set(); availableActionTypes = new Set();
+            if (!rawData) return;
+            rawData.forEach(item => {
+                const adName = item.ad_name, date = item.date_start;
+                dateSet.add(date);
+                if (!adsDataMap[adName]) adsDataMap[adName] = { objective: (item.objective || 'N/A').replace(/_/g, ' ').toLowerCase(), audience: item.adset_name || 'N/A', daily: {} };
+                const actionsMap = {};
+                if (item.actions) item.actions.forEach(act => { actionsMap[act.action_type] = parseInt(act.value || 0); availableActionTypes.add(act.action_type); });
+                adsDataMap[adName].daily[date] = { actionsMap, spend: parseFloat(item.spend) || 0, reach: parseInt(item.reach) || 0, frequency: parseFloat(item.frequency) || 0, impressions: parseInt(item.impressions) || 0 };
+            });
+            sortedDates = Array.from(dateSet).sort();
+        }
+
+        function updateMetricSelector() {
+            const selector = document.getElementById('metric-selector');
+            let optionsHtml = '<option value="all">Total Actions (All)</option>';
+            Array.from(availableActionTypes).sort().forEach(type => optionsHtml += `<option value="${type}">${type.replace(/_/g, ' ')}</option>`);
+            selector.innerHTML = optionsHtml;
+        }
+
+        function renderTableUI(fromSearch = false) {
+            const wrapper = document.getElementById('table-wrapper');
+            if (Object.keys(adsDataMap).length === 0) return;
+            wrapper.classList.remove('d-none');
+            document.getElementById('empty-state').classList.add('d-none');
+            let headHtml = `<tr><th class="ad-name-col"><div class="ad-name-header"><span>Ads Name</span><div class="search-container"><i class="bi bi-search"></i><input type="text" id="ad-search" class="form-control form-control-sm" placeholder="Search..." value="${currentFilter}"></div></div></th>`;
+            sortedDates.forEach(d => headHtml += `<th class="text-center">${new Date(d).toLocaleDateString('en-US', { month: 'short', day: '2-digit' })}</th>`);
+            headHtml += `<th class="text-center total-col">Total / Avg</th></tr>`;
+            document.getElementById('table-head').innerHTML = headHtml;
+            
+            const searchInput = document.getElementById('ad-search');
+            searchInput.addEventListener('input', (e) => { 
+                currentFilter = e.target.value; 
+                renderTableUI(true); 
+            });
+            
+            // Fix: If re-rendered during a search, restore focus and move cursor to the end
+            // to prevent "retsop" reversed typing behavior.
+            if (fromSearch) {
+                searchInput.focus();
+                searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+            }
+
+            const names = Object.keys(adsDataMap).filter(n => n.toLowerCase().includes(currentFilter.toLowerCase())).sort((a,b) => (pinnedAds.has(a) ? -1 : 1));
+            let bodyHtml = '';
+            names.forEach(adName => {
+                const isPinned = pinnedAds.has(adName); const info = adsDataMap[adName];
+                let rRes = 0, rSpend = 0, rReach = 0, rImps = 0;
+                bodyHtml += `<tr class="${isPinned ? 'pinned-row' : ''}"><td class="ad-name-col fw-bold"><div class="ad-row-content"><div class="ad-info-main"><span>${adName}</span><div class="ad-meta-subtitle text-capitalize">${info.objective} • ${info.audience}</div></div><i class="bi bi-pin-angle${isPinned ? '-fill active' : ''} pin-btn ms-2" onclick="togglePin('${adName.replace(/'/g, "\\'")}')"></i></div></td>`;
+                sortedDates.forEach(date => {
+                    const daily = info.daily[date] || { spend: 0, reach: 0, frequency: 0, impressions: 0, actionsMap: {} };
+                    const resCount = selectedMetric === 'all' ? Object.values(daily.actionsMap).reduce((a,b) => a+b, 0) : (daily.actionsMap[selectedMetric] || 0);
+                    rRes += resCount; rSpend += daily.spend; rReach += daily.reach; rImps += daily.impressions;
+                    bodyHtml += `<td class="text-center metric-cell border-start"><div class="d-flex flex-column">${showReachFreq ? `<span class="reach-freq-value mb-1">${daily.reach.toLocaleString()} (${daily.frequency.toFixed(2)})</span>` : ''}<span class="res-value">${resCount || '-'}</span><span class="cpr-value">${resCount > 0 ? formatCurrency(daily.spend/resCount) : '-'}</span></div></td>`;
+                });
+                bodyHtml += `<td class="text-center metric-cell total-col"><div class="d-flex flex-column">${showReachFreq ? `<span class="reach-freq-value mb-1">${rReach.toLocaleString()} (${(rImps/(rReach||1)).toFixed(2)})</span>` : ''}<span class="res-value text-dark">${rRes || '-'}</span><span class="cpr-value text-dark">${rRes > 0 ? formatCurrency(rSpend/rRes) : '-'}</span></div></td></tr>`;
+            });
+            document.getElementById('table-body').innerHTML = bodyHtml;
+        }
+
+        function togglePin(name) { pinnedAds.has(name) ? pinnedAds.delete(name) : pinnedAds.add(name); renderTableUI(); }
+        function logout() { if (window.FB) FB.logout(() => location.reload()); else location.reload(); }
+        document.getElementById('btn-login').addEventListener('click', login);
+        document.getElementById('btn-fetch').addEventListener('click', fetchReport);
+        document.getElementById('metric-selector').addEventListener('change', (e) => { selectedMetric = e.target.value; renderTableUI(); });
+        document.getElementById('toggle-reach-freq').addEventListener('change', (e) => { showReachFreq = e.target.checked; renderTableUI(); });
+    </script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CJP2KHHH7"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-1CJP2KHHH7');
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "robotysnet"
+pages_build_output_dir = "dist"
+
+# D1 Database binding for Cloudflare Pages / Workers
+[[d1_databases]]
+binding = "DB"
+database_name = "robotysnet_db"
+database_id = "3a550b29-340a-4a11-8317-4082905c125b" # Replace with actual Cloudflare D1 Database ID
+
+# Local D1 config notes:
+# To create a D1 database on Cloudflare: wrangler d1 create robotysnet_db
+# To run local migrations: wrangler d1 migrations apply robotysnet_db --local

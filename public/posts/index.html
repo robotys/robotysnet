@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Posts & Articles | robotys.net</title>
+  <meta name="description" content="View the list of utility guides and product updates on robotys.net.">
+  <link rel="canonical" href="https://robotys.net/posts/">
+  <link rel="icon" type="image/png" href="/favicon.png" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gveret+Levin&family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --page-bg: #faf9f6;
+      --text-primary: #111111;
+      --gray-muted: #6e6a64;
+      --border-dark: #222222;
+      --link-blue: #0022ff;
+      --link-blue-hover: #0011aa;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .app-card {
+      width: 100%;
+      max-width: 960px;
+      background-color: transparent;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .avatar-circle {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      overflow: hidden;
+      background-color: #eee;
+      flex-shrink: 0;
+    }
+
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .brand-title {
+      font-family: 'Gveret Levin', cursive;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      margin-top: 16px;
+    }
+
+    a,
+    .blue-link {
+      color: var(--link-blue);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+
+    a:hover,
+    .blue-link:hover {
+      color: var(--link-blue-hover);
+    }
+
+    .columns-container {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      margin-top: 16px;
+      width: 100%;
+    }
+    
+    .left-column {
+      padding: 24px 32px 24px 0;
+    }
+    
+    .right-column {
+      padding: 24px 0 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    
+    @media (max-width: 768px) {
+      .columns-container {
+        grid-template-columns: 1fr;
+      }
+      .left-column {
+        padding: 24px 0;
+      }
+      .right-column {
+        padding: 24px 0;
+      }
+    }
+    
+    .links-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .links-list li {
+      position: relative;
+      padding-left: 16px;
+      font-size: 0.95rem;
+    }
+    
+    .links-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      color: var(--text-primary);
+    }
+
+    #posts-list {
+      gap: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-card">
+    <div class="columns-container">
+      <!-- Left Column -->
+      <section class="left-column">
+        <div class="header-content">
+          <div class="avatar-circle">
+            <img src="/robot-dp.png" alt="robotys profile avatar" />
+          </div>
+          <a href="/" class="brand-title">robotys.net</a>
+        </div>
+        
+        <main>
+          <h1>Posts</h1>
+    
+          <ul id="posts-list" class="links-list">
+            <li style="list-style:none; padding-left:0; color:var(--gray-muted);">Loading posts...</li>
+          </ul>
+          
+          <div style="margin-top: 40px; border-top: 1px solid var(--border-dark); padding-top: 20px;">
+            <a href="/" class="blue-link">&larr; Back</a>
+          </div>
+        </main>
+      </section>
+
+      <!-- Right Column -->
+      <section class="right-column">
+      </section>
+    </div>
+  </div>
+
+  <script>
+    async function loadPosts() {
+      const container = document.getElementById('posts-list');
+      try {
+        const response = await fetch('/api/posts');
+        if (!response.ok) throw new Error('Failed to load posts');
+        const posts = await response.json();
+
+        if (posts.length === 0) {
+          container.innerHTML = '<li style="list-style:none; padding-left:0; color:var(--gray-muted); font-style:italic;">No articles published yet.</li>';
+          return;
+        }
+
+        container.innerHTML = posts.map(post => `
+          <li style="margin-bottom: 0; list-style-type: none; padding-left: 0;">
+            <a href="/post/${post.slug}" style="font-weight: 600; font-size: 1.05rem; display: inline-block;">
+              ${post.title} &rarr;
+            </a>
+          </li>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<li style="list-style:none; padding-left:0; color:#b56b5b;">Failed to load posts list.</li>';
+      }
+    }
+    loadPosts();
+  </script>
+</body>
+
+</html>

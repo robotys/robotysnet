@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AdCompare | Real-Time Meta Ads Dashboard | Free Online Developer Tools</title>
+  <meta name="description" content="Log in securely with Facebook to pull real-time campaign insights and compare ad performance. Simple local comparative ad dashboard.">
+  <meta name="keywords" content="meta ads comparison, facebook ads dashboard, compare meta campaigns, online marketing tools">
+  <link rel="canonical" href="https://robotys.net/posts/adcompare.html">
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gveret+Levin&family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
+
+    :root {
+      --page-bg: #faf9f6;
+      --text-primary: #111111;
+      --gray-muted: #6e6a64;
+      --border-dark: #222222;
+      --link-blue: #0022ff;
+      --link-blue-hover: #0011aa;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    
+    .app-card {
+      width: 100%;
+      max-width: 960px;
+      background-color: transparent;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    
+    .avatar-circle {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      overflow: hidden;
+      background-color: #eee;
+      flex-shrink: 0;
+    }
+    
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .brand-title {
+      font-family: 'Gveret Levin', cursive;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    
+    .columns-container {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      margin-top: 16px;
+      width: 100%;
+    }
+    
+    .left-column {
+      padding: 24px 32px 24px 0;
+    }
+    
+    .right-column {
+      padding: 24px 0 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    
+    @media (max-width: 768px) {
+      .columns-container {
+        grid-template-columns: 1fr;
+      }
+      .left-column {
+        padding: 24px 0;
+      }
+      .right-column {
+        padding: 24px 0;
+      }
+    }
+
+    .links-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .links-list li {
+      position: relative;
+      padding-left: 16px;
+      font-size: 0.95rem;
+    }
+
+    .links-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      color: var(--text-primary);
+    }
+    
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+    
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-top: 32px;
+      margin-bottom: 12px;
+    }
+    
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    p {
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+    }
+    
+    p.intro {
+      font-size: 1.1rem;
+      margin-bottom: 24px;
+    }
+    
+    a, .blue-link {
+      color: var(--link-blue);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+    
+    a:hover, .blue-link:hover {
+      color: var(--link-blue-hover);
+    }
+    
+    .cta-container {
+      background-color: var(--page-bg);
+      border: 1px dashed var(--border-dark);
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+      margin-top: 24px;
+    }
+    
+    .btn {
+      display: inline-block;
+      background-color: var(--text-primary);
+      color: #ffffff;
+      padding: 10px 20px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: opacity 0.2s;
+    }
+    
+    .btn:hover {
+      opacity: 0.9;
+    }
+    
+    ul.features-list {
+      margin-bottom: 24px;
+      padding-left: 20px;
+    }
+    
+    ul.features-list li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-card">
+    <div class="columns-container">
+      <!-- Left Column - Dynamic Content / Bio -->
+      <section class="left-column">
+        <div class="header-content">
+          <div class="avatar-circle">
+            <img src="/robot-dp.png" alt="robotys profile avatar" />
+          </div>
+          <a href="/" class="brand-title">robotys.net</a>
+        </div>
+        
+        <article>
+          <h1>AdCompare | Real-Time Meta Ads Dashboard</h1>
+          <p class="intro">Connect securely using the official Meta Graph API SDK to load campaigns, compare ad variations across custom dates, pin metrics, and identify high-performing creatives locally.</p>
+          
+          <div class="cta-container">
+            <h3 style="margin-bottom: 8px;">Ready to compare Meta Ads?</h3>
+            <p style="color: var(--gray-muted); margin-bottom: 16px; font-size: 0.9rem;">Launch our meta integrations console to analyze campaign results.</p>
+            <a href="/apps/adcompare/" class="btn">Launch AdCompare</a>
+          </div>
+
+          <h2>Key Features</h2>
+          <ul class="features-list">
+            <li><strong>Official Facebook Login:</strong> Pull data securely using Meta SDK authorization protocols.</li>
+            <li><strong>Side-by-Side Variations:</strong> Sort and compare ad metrics (reach, frequency, CTR, CPC, result volume).</li>
+            <li><strong>Interactive Pinning:</strong> Pin specific ad rows to the top of your layout for benchmark comparison.</li>
+            <li><strong>Privacy First:</strong> Ad account settings and access tokens are managed client-side and never saved on external database servers.</li>
+          </ul>
+        </article>
+        
+        <div style="margin-top: 40px; border-top: 1px solid var(--border-dark); padding-top: 20px;">
+          <a href="/posts/" class="blue-link">&larr; Back to Posts</a>
+        </div>
+      </section>
+
+      <!-- Right Column -->
+      <section class="right-column">
+      </section>
+    </div>
+  </div>
+
+</body>
+</html>
