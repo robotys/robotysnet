@@ -62,7 +62,7 @@ export default function App() {
         {/* Right Column - Navigation / Links */}
         <section className="right-column">
           <div>
-            <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '16px' }}>Links:</h3>
+            <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '16px' }}>Featured:</h3>
             <ul className="links-list">
               {loadingLinks ? (
                 <li>Loading links...</li>

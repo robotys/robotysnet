@@ -54,7 +54,7 @@ async function run() {
         <!-- Right Column - Navigation / Links -->
         <section class="right-column">
           <div>
-            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px;">Links:</h3>
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px;">Featured:</h3>
             <ul class="links-list">
               <!-- LINKS_PLACEHOLDER -->
             </ul>
