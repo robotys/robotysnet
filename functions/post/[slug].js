@@ -1,5 +1,5 @@
 export async function onRequestGet(context) {
-  const { env, params } = context;
+  const { env, params, request } = context;
   const { slug } = params;
   const db = env.DB;
 
@@ -19,6 +19,18 @@ export async function onRequestGet(context) {
       day: 'numeric'
     });
 
+    // Extract first image URL from markdown if exists
+    let ogImageUrl = '';
+    const imgRegex = /!\[.*?\]\((.*?)\)/;
+    const match = (post.markdown || '').match(imgRegex);
+    if (match && match[1]) {
+      ogImageUrl = match[1];
+      if (ogImageUrl.startsWith('/')) {
+        const urlObj = new URL(request.url);
+        ogImageUrl = `${urlObj.origin}${ogImageUrl}`;
+      }
+    }
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,6 +38,11 @@ export async function onRequestGet(context) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(post.title)} | robotys.net</title>
   <meta name="description" content="${escapeHtml(post.hook || '')}">
+  <meta property="og:title" content="${escapeHtml(post.title)}" />
+  <meta property="og:description" content="${escapeHtml(post.hook || '')}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="${request.url}" />
+  ${ogImageUrl ? `<meta property="og:image" content="${escapeHtml(ogImageUrl)}" />` : ''}
   <link rel="icon" type="image/png" href="/favicon.png" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Gveret+Levin&family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
@@ -315,6 +332,9 @@ function markdownToHtml(markdown) {
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
   html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
+
+  // Images
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; display: block; margin: 16px 0;" />');
 
   // Links
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');

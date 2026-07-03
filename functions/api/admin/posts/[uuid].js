@@ -56,23 +56,52 @@ export async function onRequestPut(context) {
     const body = await request.json();
     let { title, slug, status, tags, hook, markdown } = body;
 
-    if (!title || !slug) {
-      return new Response(JSON.stringify({ error: "Title and slug are required." }), {
+    if (!title || !title.trim()) {
+      return new Response(JSON.stringify({ error: "Title is required." }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    // Clean and validate slug as kebab-case
-    slug = slug.toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+    // Auto-generate slug from title if empty, otherwise normalize it
+    if (!slug || !slug.trim()) {
+      slug = title.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+    } else {
+      slug = slug.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+    }
 
     if (!slug) {
       return new Response(JSON.stringify({ error: "Invalid slug format." }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
+    }
+
+    // Auto-generate hook from first markdown paragraph if empty
+    if (!hook || !hook.trim()) {
+      const blocks = (markdown || '').split(/\n\s*\n/);
+      let firstParagraph = '';
+      for (const block of blocks) {
+        const trimmed = block.trim();
+        if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('- ') && !trimmed.startsWith('* ') && !trimmed.startsWith('![')) {
+          firstParagraph = trimmed
+            .replace(/\*\*([^*]+)\*\*/g, '$1')
+            .replace(/\*([^*]+)\*/g, '$1')
+            .replace(/_([^_]+)_/g, '$1')
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
+            .replace(/`([^`]+)`/g, '$1');
+          break;
+        }
+      }
+      if (firstParagraph) {
+        hook = firstParagraph.length > 200 ? firstParagraph.substring(0, 197) + '...' : firstParagraph;
+      } else {
+        hook = '';
+      }
     }
 
     // Fetch existing post to check publication date

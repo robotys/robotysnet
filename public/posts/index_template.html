@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Posts & Articles | robotys.net</title>
-  <meta name="description" content="View the list of utility guides and product updates on robotys.net.">
-  <link rel="canonical" href="https://robotys.net/posts/">
+  <title>Posts | robotys.net</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
-
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Gveret+Levin&family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Gveret+Levin&family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
 
     :root {
       --page-bg: #faf9f6;
@@ -21,13 +17,13 @@
       --link-blue-hover: #0011aa;
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-
+    
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-
+    
     body {
       background-color: var(--page-bg);
       color: var(--text-primary);
@@ -54,7 +50,7 @@
       gap: 16px;
       margin-bottom: 28px;
     }
-
+    
     .avatar-circle {
       width: 54px;
       height: 54px;
@@ -63,13 +59,13 @@
       background-color: #eee;
       flex-shrink: 0;
     }
-
+    
     .avatar-circle img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-
+    
     .brand-title {
       font-family: 'Gveret Levin', cursive;
       font-size: 2rem;
@@ -79,12 +75,12 @@
       text-decoration: none;
       cursor: pointer;
     }
-
+    
     h1 {
-      font-size: 1.6rem;
+      font-size: 2.2rem;
       font-weight: 600;
-      margin-bottom: 20px;
-      margin-top: 16px;
+      margin-bottom: 24px;
+      line-height: 1.2;
     }
 
     a,
@@ -174,7 +170,7 @@
           <h1>Posts</h1>
     
           <ul id="posts-list" class="links-list">
-            <li style="list-style:none; padding-left:0; color:var(--gray-muted);">Loading posts...</li>
+            <!-- POSTS_PLACEHOLDER -->
           </ul>
           
           <div style="margin-top: 40px; border-top: 1px solid var(--border-dark); padding-top: 20px;">
@@ -189,33 +185,5 @@
     </div>
   </div>
 
-  <script>
-    async function loadPosts() {
-      const container = document.getElementById('posts-list');
-      try {
-        const response = await fetch('/api/posts');
-        if (!response.ok) throw new Error('Failed to load posts');
-        const posts = await response.json();
-
-        if (posts.length === 0) {
-          container.innerHTML = '<li style="list-style:none; padding-left:0; color:var(--gray-muted); font-style:italic;">No articles published yet.</li>';
-          return;
-        }
-
-        container.innerHTML = posts.map(post => `
-          <li style="margin-bottom: 0; list-style-type: none; padding-left: 0;">
-            <a href="/post/${post.slug}" style="font-weight: 600; font-size: 1.05rem; display: inline-block;">
-              ${post.title} &rarr;
-            </a>
-          </li>
-        `).join('');
-      } catch (err) {
-        console.error(err);
-        container.innerHTML = '<li style="list-style:none; padding-left:0; color:#b56b5b;">Failed to load posts list.</li>';
-      }
-    }
-    loadPosts();
-  </script>
 </body>
-
 </html>

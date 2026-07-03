@@ -1,3 +1,4 @@
+import { onRequestPost as __api_admin_images_upload_js_onRequestPost } from "/Users/mpa014/Code/robotysnet/functions/api/admin/images/upload.js"
 import { onRequestDelete as __api_admin_links__id__js_onRequestDelete } from "/Users/mpa014/Code/robotysnet/functions/api/admin/links/[id].js"
 import { onRequestPut as __api_admin_links__id__js_onRequestPut } from "/Users/mpa014/Code/robotysnet/functions/api/admin/links/[id].js"
 import { onRequestGet as __api_admin_posts__uuid__js_onRequestGet } from "/Users/mpa014/Code/robotysnet/functions/api/admin/posts/[uuid].js"
@@ -11,16 +12,26 @@ import { onRequestPost as __api_auth_login_js_onRequestPost } from "/Users/mpa01
 import { onRequestPost as __api_auth_logout_js_onRequestPost } from "/Users/mpa014/Code/robotysnet/functions/api/auth/logout.js"
 import { onRequestGet as __api_auth_me_js_onRequestGet } from "/Users/mpa014/Code/robotysnet/functions/api/auth/me.js"
 import { onRequestPost as __api_auth_register_js_onRequestPost } from "/Users/mpa014/Code/robotysnet/functions/api/auth/register.js"
+import { onRequestGet as __api_auth_setup_status_js_onRequestGet } from "/Users/mpa014/Code/robotysnet/functions/api/auth/setup-status.js"
 import { onRequestPost as __api_auth_upgrade_js_onRequestPost } from "/Users/mpa014/Code/robotysnet/functions/api/auth/upgrade.js"
 import { onRequestGet as __api_links_js_onRequestGet } from "/Users/mpa014/Code/robotysnet/functions/api/links.js"
 import { onRequestGet as __api_posts_js_onRequestGet } from "/Users/mpa014/Code/robotysnet/functions/api/posts.js"
+import { onRequestGet as __images__filename__js_onRequestGet } from "/Users/mpa014/Code/robotysnet/functions/images/[filename].js"
 import { onRequestGet as __post__slug__js_onRequestGet } from "/Users/mpa014/Code/robotysnet/functions/post/[slug].js"
 import { onRequest as __admin___path___js_onRequest } from "/Users/mpa014/Code/robotysnet/functions/admin/[[path]].js"
 import { onRequestGet as __sitemap_xml_js_onRequestGet } from "/Users/mpa014/Code/robotysnet/functions/sitemap.xml.js"
+import { onRequest as __posts_index_js_onRequest } from "/Users/mpa014/Code/robotysnet/functions/posts/index.js"
 import { onRequest as __index_js_onRequest } from "/Users/mpa014/Code/robotysnet/functions/index.js"
 
 export const routes = [
     {
+      routePath: "/api/admin/images/upload",
+      mountPath: "/api/admin/images",
+      method: "POST",
+      middlewares: [],
+      modules: [__api_admin_images_upload_js_onRequestPost],
+    },
+  {
       routePath: "/api/admin/links/:id",
       mountPath: "/api/admin/links",
       method: "DELETE",
@@ -112,6 +123,13 @@ export const routes = [
       modules: [__api_auth_register_js_onRequestPost],
     },
   {
+      routePath: "/api/auth/setup-status",
+      mountPath: "/api/auth",
+      method: "GET",
+      middlewares: [],
+      modules: [__api_auth_setup_status_js_onRequestGet],
+    },
+  {
       routePath: "/api/auth/upgrade",
       mountPath: "/api/auth",
       method: "POST",
@@ -133,6 +151,13 @@ export const routes = [
       modules: [__api_posts_js_onRequestGet],
     },
   {
+      routePath: "/images/:filename",
+      mountPath: "/images",
+      method: "GET",
+      middlewares: [],
+      modules: [__images__filename__js_onRequestGet],
+    },
+  {
       routePath: "/post/:slug",
       mountPath: "/post",
       method: "GET",
@@ -152,6 +177,13 @@ export const routes = [
       method: "GET",
       middlewares: [],
       modules: [__sitemap_xml_js_onRequestGet],
+    },
+  {
+      routePath: "/posts",
+      mountPath: "/posts",
+      method: "",
+      middlewares: [],
+      modules: [__posts_index_js_onRequest],
     },
   {
       routePath: "/",

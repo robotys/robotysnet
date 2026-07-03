@@ -11,3 +11,8 @@ database_id = "3a550b29-340a-4a11-8317-4082905c125b" # Replace with actual Cloud
 # Local D1 config notes:
 # To create a D1 database on Cloudflare: wrangler d1 create robotysnet_db
 # To run local migrations: wrangler d1 migrations apply robotysnet_db --local
+
+# R2 Bucket binding for Cloudflare Pages / Workers
+[[r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "robotysnet-images"

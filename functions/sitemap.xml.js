@@ -49,7 +49,7 @@ ${postUrls.map(u => `  <url>
       status: 200,
       headers: {
         "Content-Type": "application/xml; charset=utf-8",
-        "Cache-Control": "public, max-age=60"
+        "Cache-Control": "no-cache, no-store, must-revalidate"
       }
     });
   } catch (err) {

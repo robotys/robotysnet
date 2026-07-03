@@ -12,7 +12,7 @@ export async function onRequestGet(context) {
       status: 200,
       headers: { 
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=60" // Cache publicly for 60 seconds
+        "Cache-Control": "no-cache, no-store, must-revalidate"
       }
     });
   } catch (err) {

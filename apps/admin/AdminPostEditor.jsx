@@ -75,6 +75,76 @@ export default function AdminPostEditor({ uuid, navigateTo }) {
     }
   };
 
+  const textareaRef = useRef(null);
+
+  const handlePaste = async (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.indexOf('image') !== -1) {
+        const file = item.getAsFile();
+        if (!file) continue;
+
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        setError(null);
+        setSuccess(false);
+
+        const cursorStart = textareaRef.current.selectionStart;
+        const cursorEnd = textareaRef.current.selectionEnd;
+        const currentText = textareaRef.current.value;
+
+        const placeholder = `![Uploading image...]()`;
+        const updatedText = currentText.substring(0, cursorStart) + placeholder + currentText.substring(cursorEnd);
+        setMarkdown(updatedText);
+
+        try {
+          const response = await fetch('/api/admin/images/upload', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Upload failed');
+          }
+
+          const imageMarkdown = `![Image](${data.url})`;
+          setMarkdown(prevText => {
+            const index = prevText.indexOf(placeholder);
+            if (index !== -1) {
+              return prevText.substring(0, index) + imageMarkdown + prevText.substring(index + placeholder.length);
+            }
+            return prevText + '\n' + imageMarkdown;
+          });
+
+          setTimeout(() => {
+            if (textareaRef.current) {
+              textareaRef.current.focus();
+              const newCursorPos = cursorStart + imageMarkdown.length;
+              textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+            }
+          }, 50);
+
+        } catch (err) {
+          setError(`Image upload failed: ${err.message}`);
+          setMarkdown(prevText => {
+            const index = prevText.indexOf(placeholder);
+            if (index !== -1) {
+              return prevText.substring(0, index) + prevText.substring(index + placeholder.length);
+            }
+            return prevText;
+          });
+        }
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -103,13 +173,13 @@ export default function AdminPostEditor({ uuid, navigateTo }) {
             <span style={{ fontSize: '0.85rem', color: '#6e6a64' }}>Post UUID: {uuid}</span>
           </div>
         </header>
-
+ 
         {error && (
           <div style={{ padding: '16px', backgroundColor: '#fdf3f2', border: '1px solid #b56b5b', color: '#b56b5b', marginBottom: '24px', fontSize: '0.9rem' }}>
             Error: {error}
           </div>
         )}
-
+ 
         {/* Success Toast */}
         <div style={{
           position: 'fixed',
@@ -134,7 +204,7 @@ export default function AdminPostEditor({ uuid, navigateTo }) {
         }}>
           <span style={{ fontSize: '1.1rem' }}>✓</span> Changes saved successfully!
         </div>
-
+ 
         <form onSubmit={handleSave} style={{ display: 'flex', flexWrap: 'wrap', gap: '40px' }}>
           
           {/* Left Column: Title and Markdown editor (65% width) */}
@@ -158,14 +228,16 @@ export default function AdminPostEditor({ uuid, navigateTo }) {
                 }}
               />
             </div>
-
+ 
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '8px' }}>
                 Markdown Content
               </label>
               <textarea
+                ref={textareaRef}
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
+                onPaste={handlePaste}
                 placeholder="Write your article markdown here..."
                 style={{
                   width: '100%',
