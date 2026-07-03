@@ -132,7 +132,7 @@ async function onRequestPost(context) {
         headers: { "Content-Type": "application/json" }
       });
     }
-    const buffer = await file.arrayBuffer();
+    const buffer = await new Response(file).arrayBuffer();
     const hashBuffer = await crypto.subtle.digest("MD5", buffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
@@ -2072,7 +2072,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-iUSNUD/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-EBsWul/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -2104,7 +2104,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-iUSNUD/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-EBsWul/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

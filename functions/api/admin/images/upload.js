@@ -22,7 +22,7 @@ export async function onRequestPost(context) {
       });
     }
 
-    const buffer = await file.arrayBuffer();
+    const buffer = await new Response(file).arrayBuffer();
 
     // 1. Compute MD5 Checksum
     const hashBuffer = await crypto.subtle.digest("MD5", buffer);
