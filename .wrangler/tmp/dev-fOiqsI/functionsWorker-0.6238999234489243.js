@@ -914,6 +914,19 @@ async function onRequestGet9(context) {
     object.writeHttpMetadata(headers);
     headers.set("etag", object.httpEtag);
     headers.set("Cache-Control", "public, max-age=31536000, immutable");
+    const ext = filename.split(".").pop().toLowerCase();
+    const mimeTypes = {
+      "png": "image/png",
+      "jpg": "image/jpeg",
+      "jpeg": "image/jpeg",
+      "gif": "image/gif",
+      "webp": "image/webp",
+      "svg": "image/svg+xml",
+      "ico": "image/x-icon"
+    };
+    if (mimeTypes[ext]) {
+      headers.set("Content-Type", mimeTypes[ext]);
+    }
     return new Response(object.body, {
       headers
     });

@@ -919,6 +919,19 @@ async function onRequestGet9(context) {
     object.writeHttpMetadata(headers);
     headers.set("etag", object.httpEtag);
     headers.set("Cache-Control", "public, max-age=31536000, immutable");
+    const ext = filename.split(".").pop().toLowerCase();
+    const mimeTypes = {
+      "png": "image/png",
+      "jpg": "image/jpeg",
+      "jpeg": "image/jpeg",
+      "gif": "image/gif",
+      "webp": "image/webp",
+      "svg": "image/svg+xml",
+      "ico": "image/x-icon"
+    };
+    if (mimeTypes[ext]) {
+      headers.set("Content-Type", mimeTypes[ext]);
+    }
     return new Response(object.body, {
       headers
     });
@@ -2072,7 +2085,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-EBsWul/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-UEqHtb/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -2104,7 +2117,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-EBsWul/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-UEqHtb/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;
