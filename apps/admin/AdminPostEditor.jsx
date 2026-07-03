@@ -89,9 +89,6 @@ export default function AdminPostEditor({ uuid, navigateTo }) {
 
         e.preventDefault();
 
-        const formData = new FormData();
-        formData.append('file', file);
-
         setError(null);
         setSuccess(false);
 
@@ -104,9 +101,15 @@ export default function AdminPostEditor({ uuid, navigateTo }) {
         setMarkdown(updatedText);
 
         try {
-          const response = await fetch('/api/admin/images/upload', {
+          const buffer = await file.arrayBuffer();
+          const uploadUrl = `/api/admin/images/upload?filename=${encodeURIComponent(file.name || 'image.png')}&type=${encodeURIComponent(file.type || 'image/png')}`;
+
+          const response = await fetch(uploadUrl, {
             method: 'POST',
-            body: formData
+            body: buffer,
+            headers: {
+              'Content-Type': 'application/octet-stream'
+            }
           });
           const data = await response.json();
 

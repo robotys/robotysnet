@@ -12,17 +12,19 @@ export async function onRequestPost(context) {
   }
 
   try {
-    const formData = await request.formData();
-    const file = formData.get('file');
+    const url = new URL(request.url);
+    const filenameParam = url.searchParams.get('filename') || 'image.png';
+    const mimeTypeParam = url.searchParams.get('type') || 'application/octet-stream';
 
-    if (!file) {
-      return new Response(JSON.stringify({ error: "No file uploaded" }), {
+    // Read the raw binary request body directly
+    const buffer = await request.arrayBuffer();
+
+    if (!buffer || buffer.byteLength === 0) {
+      return new Response(JSON.stringify({ error: "Empty file payload" }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
-
-    const buffer = await new Response(file.stream()).arrayBuffer();
 
     // 1. Compute MD5 Checksum
     const hashBuffer = await crypto.subtle.digest("MD5", buffer);
@@ -31,10 +33,10 @@ export async function onRequestPost(context) {
 
     // 2. Determine File Extension
     let extension = 'png';
-    if (file.name && file.name.includes('.')) {
-      extension = file.name.split('.').pop().toLowerCase();
-    } else if (file.type) {
-      const parts = file.type.split('/');
+    if (filenameParam && filenameParam.includes('.')) {
+      extension = filenameParam.split('.').pop().toLowerCase();
+    } else if (mimeTypeParam) {
+      const parts = mimeTypeParam.split('/');
       if (parts.length === 2) {
         extension = parts[1].toLowerCase();
       }
@@ -53,7 +55,7 @@ export async function onRequestPost(context) {
 
     await bucket.put(filename, buffer, {
       httpMetadata: {
-        contentType: file.type || 'application/octet-stream',
+        contentType: mimeTypeParam,
         cacheControl: 'public, max-age=31536000',
       }
     });

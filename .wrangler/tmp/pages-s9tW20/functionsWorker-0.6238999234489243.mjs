@@ -124,23 +124,24 @@ async function onRequestPost(context) {
     });
   }
   try {
-    const formData = await request.formData();
-    const file = formData.get("file");
-    if (!file) {
-      return new Response(JSON.stringify({ error: "No file uploaded" }), {
+    const url = new URL(request.url);
+    const filenameParam = url.searchParams.get("filename") || "image.png";
+    const mimeTypeParam = url.searchParams.get("type") || "application/octet-stream";
+    const buffer = await request.arrayBuffer();
+    if (!buffer || buffer.byteLength === 0) {
+      return new Response(JSON.stringify({ error: "Empty file payload" }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
     }
-    const buffer = await new Response(file.stream()).arrayBuffer();
     const hashBuffer = await crypto.subtle.digest("MD5", buffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
     let extension = "png";
-    if (file.name && file.name.includes(".")) {
-      extension = file.name.split(".").pop().toLowerCase();
-    } else if (file.type) {
-      const parts = file.type.split("/");
+    if (filenameParam && filenameParam.includes(".")) {
+      extension = filenameParam.split(".").pop().toLowerCase();
+    } else if (mimeTypeParam) {
+      const parts = mimeTypeParam.split("/");
       if (parts.length === 2) {
         extension = parts[1].toLowerCase();
       }
@@ -155,7 +156,7 @@ async function onRequestPost(context) {
     }
     await bucket.put(filename, buffer, {
       httpMetadata: {
-        contentType: file.type || "application/octet-stream",
+        contentType: mimeTypeParam,
         cacheControl: "public, max-age=31536000"
       }
     });
@@ -2085,7 +2086,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-Eg8Tjm/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-4nEwx5/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -2117,7 +2118,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-Eg8Tjm/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-4nEwx5/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;
