@@ -137,7 +137,7 @@ async function onRequestPost(context) {
         headers: { "Content-Type": "application/json" }
       });
     }
-    const buffer = await new Response(file).arrayBuffer();
+    const buffer = await new Response(file.stream()).arrayBuffer();
     const hashBuffer = await crypto.subtle.digest("MD5", buffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
